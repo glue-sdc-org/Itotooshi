@@ -1,0 +1,23 @@
+# Built application files
+*.apk
+
+# Gradle files
+.gradle/
+build/
+/*/build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+*.iml
+
+# .idea files
+.idea/**/*
+
+!.idea/gradle.xml
+!.idea/checkstyle-idea.xml
+!.idea/findbugs-idea.xml
+!.idea/inspectionProfiles/
+!.idea/copyright/
+
+# Mac
+.DS_Store
