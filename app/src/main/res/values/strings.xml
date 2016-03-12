@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Itotooshi</string>
+
+    <!-- 記録画面 -->
+    <string name="record_title_label">記録</string>
+    <string name="record_max_label">最高：</string>
+    <string name="record_count_label">回数：</string>
 </resources>

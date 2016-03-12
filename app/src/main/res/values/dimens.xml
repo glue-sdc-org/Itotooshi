@@ -2,4 +2,9 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- 記録画面 -->
+    <dimen name="record_title">30sp</dimen>
+    <dimen name="record_max">20sp</dimen>
+    <dimen name="record_count">20sp</dimen>
 </resources>
