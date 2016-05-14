@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
@@ -13,8 +14,8 @@ import android.view.WindowManager;
 
 import com.daasuu.library.DisplayObject;
 import com.daasuu.library.FPSTextureView;
+import com.daasuu.library.callback.AnimCallBack;
 import com.daasuu.library.drawer.BitmapDrawer;
-import com.daasuu.library.drawer.TextDrawer;
 import com.daasuu.library.easing.Ease;
 import com.daasuu.library.util.Util;
 
@@ -22,7 +23,12 @@ import com.daasuu.library.util.Util;
  * Created by Megumi on 4/30/16.
  */
 public class PlayActivity extends AppCompatActivity{
+    /** 画像追加間隔（ミリ秒） */
+    private static final int BITMAP_ADD_INTERVAL = 1500;
+    /** FPSテクスチャ */
     private FPSTextureView mFPSTextureView;
+    /** 画像追加用ハンドラ */
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,44 +36,16 @@ public class PlayActivity extends AppCompatActivity{
         setContentView(R.layout.activity_play);
         mFPSTextureView = (FPSTextureView) findViewById(R.id.animation_texture_view);
 
-        int cnt = 0;
-        Paint paint = new Paint();
-        paint.setColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
-        paint.setTextSize(Util.convertDpToPixel(12, this));
-
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-        float bitmapInitialX = paint.measureText(Ease.BOUNCE_IN_OUT.name()) + 50;
-
-
-        for (Ease ease : Ease.values()) {
-
-            float initialY = paint.getTextSize() * cnt * 1.3f;
-
-            DisplayObject easeName = new DisplayObject();
-            easeName.with(new TextDrawer(ease.name(), paint))
-                    .tween()
-                    .transform(0, initialY)
-                    .end();
-
-
-            DisplayObject bitmapTween = new DisplayObject();
-            bitmapTween.with(new BitmapDrawer(bitmap).dpSize(this))
-                    .tween()
-                    .tweenLoop(true)
-                    .transform(bitmapInitialX, initialY)
-                    .waitTime(1000)
-                    .toX(1000, getWindowWidth(this) - Util.convertPixelsToDp(bitmap.getWidth(), this), ease)
-                    .waitTime(1000)
-                    .toX(1000, bitmapInitialX, ease)
-                    .end();
-
-
-            mFPSTextureView
-                    .addChild(easeName)
-                    .addChild(bitmapTween);
-
-            cnt++;
-        }
+        handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 画像追加処理
+                DisplayObject bitmapTween = createDisplayObject((int)(Math.random() * 1000) + 1);
+                mFPSTextureView.addChild(bitmapTween);
+                handler.postDelayed(this, BITMAP_ADD_INTERVAL);
+            }
+        }, BITMAP_ADD_INTERVAL);
     }
 
     @Override
@@ -80,6 +58,7 @@ public class PlayActivity extends AppCompatActivity{
     protected void onStop() {
         super.onStop();
         mFPSTextureView.tickStop();
+        handler.removeCallbacksAndMessages(null);
     }
 
     /**
@@ -92,4 +71,28 @@ public class PlayActivity extends AppCompatActivity{
         displayObj.getSize(size);
         return size.x;
     }
+
+    private DisplayObject createDisplayObject(int initialY) {
+        Paint paint = new Paint();
+        paint.setColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        paint.setTextSize(Util.convertDpToPixel(12, this));
+
+        // 表示する画像
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        final DisplayObject bitmapTween = new DisplayObject();
+        bitmapTween.with(new BitmapDrawer(bitmap).dpSize(this))
+                .tween()
+                .tweenLoop(false)
+                .transform(getWindowWidth(this) - Util.convertPixelsToDp(bitmap.getWidth(), this), initialY)
+                .toX(2000, 0, Ease.LINEAR)
+                .call(new AnimCallBack() {
+                    @Override
+                    public void call() {
+                        // 画像削除
+                        mFPSTextureView.removeChild(bitmapTween);
+                    }
+                })
+                .end();
+        return bitmapTween;
+   }
 }
