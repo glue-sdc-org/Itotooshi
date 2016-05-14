@@ -69,14 +69,27 @@ public class PlayActivity extends AppCompatActivity{
             cnt++;
         }
     }
-            /**
-             * @param context
-             * @return
-             */
-            public static int getWindowWidth(Context context) {
-                Display displayObj = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-                Point size = new Point();
-                displayObj.getSize(size);
-                return size.x;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mFPSTextureView.tickStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mFPSTextureView.tickStop();
+    }
+
+    /**
+     * @param context
+     * @return
+     */
+    public static int getWindowWidth(Context context) {
+        Display displayObj = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        Point size = new Point();
+        displayObj.getSize(size);
+        return size.x;
     }
 }
